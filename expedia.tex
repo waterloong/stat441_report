@@ -1,0 +1,223 @@
+\documentclass[12pt]{report}
+\title{STAT441 Final Project \\ \large Expedia Hotel Recommendation}
+\author{Alex Wan \\ Hanxin Zhang \\ Kevin Hu \\ Tahmid Mehdi}
+
+\usepackage[latin1]{inputenc}
+\usepackage{glossaries}
+\usepackage{listings}
+\usepackage[margin=1in]{geometry}
+\usepackage{tikz}
+\usepackage{pgf}
+\usepackage{pgfplots}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{decorations}
+\usetikzlibrary{shapes,arrows, fit}
+\usetikzlibrary{calc,trees,positioning,arrows,chains,shapes.geometric,%
+    shapes,shadows,matrix}
+\usepackage{amsthm, amsmath, amssymb}
+\usepackage{framed}
+\usepackage{multirow}
+\usepackage{float} % regulate image position
+\usepackage{textcomp}
+\usepackage{mathtools}
+
+
+\usepackage{color}   %May be necessary if you want to color links
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true, %set true if you want colored links
+    linktoc=all,     %set to all if you want both sections and subsections linked
+    linkcolor=blue,  %choose some color if you want links to stand out
+}
+
+
+%\addtolength{\topmargin}{-.975in}
+\setlength{\oddsidemargin}{0.1in}
+\setlength{\evensidemargin}{0.1in} \textwidth6in \textheight9.2in
+
+
+\definecolor{boxgrey}{gray}{0.95}
+
+\newcommand{\tab}{\hspace*{4ex}}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=1pt] (char) {#1};}}
+\DeclareMathOperator{\var}{Var}
+\DeclareMathOperator{\cov}{Cov}
+\DeclareMathOperator{\bin}{Bin}
+\DeclareMathOperator{\pr}{Pr}
+\DeclareMathOperator{\iid}{iid}
+\DeclareMathOperator{\trace}{trace}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\vs}{\text{ vs }}
+\DeclareMathOperator{\tp}{\text{T.P.}}
+\DeclareMathOperator{\sxx}{S_\text{xx}}
+\DeclareMathOperator{\syy}{S_\text{yy}}
+\DeclareMathOperator{\sxy}{S_\text{xy}}
+\DeclareMathOperator{\sstot}{\text{SS}_\text{TOT}}
+\DeclareMathOperator{\ssres}{\text{SS}_\text{res}}
+\DeclareMathOperator{\sstrt}{\text{SS}_\text{TRT}}
+\DeclareMathOperator{\mstot}{\text{MS}_\text{TOT}}
+\DeclareMathOperator{\msres}{\text{MS}_\text{res}}
+\DeclareMathOperator{\mstrt}{\text{MS}_\text{TRT}}
+\DeclareMathOperator{\df}{\text{d.f.}}
+\DeclareMathOperator{\err}{\text{err}}
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\lstset{ %
+  language=R,                     % the language of the code
+  basicstyle=\footnotesize,       % the size of the fonts that are used for the code
+  numbers=left,                   % where to put the line-numbers
+  numberstyle=\tiny\color{black},  % the style that is used for the line-numbers
+  stepnumber=1,             % the step between two line-numbers. If it's 1,each line
+                                  % will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},  % choose the background color. 
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,                   % adds a frame around the code
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. commens (green here))
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                 % show the filename of files included with \lstinputlisting;
+                                  % also try caption instead of title
+  keywordstyle=\color{blue},      % keyword style
+  commentstyle=\color{gray},   % comment style
+  stringstyle=\color{red},      % string literal style
+  morekeywords={*,...}            % if you want to add more keywords to the set
+} 
+
+\renewcommand{\chaptername}{}
+
+\begin{document}
+
+
+
+\thispagestyle{empty}
+
+\begin{center}
+\section*{Statistical Learning-Classification}
+\end{center}
+
+
+
+
+\section*{Project Title: Expedia Hotel Recommendation}
+\section*{Project Number:}
+
+{\large \textbf{Group Members}:}\\\\
+\begin{tabular}{|c|c||c| c| c| c|c|}
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+Surname, First Name $~~~~~$& Student ID   & STAT    & STAT &  Your Dept. \\
+ $~~~~~$& & 441  & 841 &  e.g. STAT, ECE, CS\\
+  \hline \hline
+   &  & $\text{\rlap{$\checkmark$}}\square$     &   $\Box$& \\\hline
+   &  & $\text{\rlap{$\checkmark$}}\square$       &  $\Box$& \\\hline
+   &  & $\text{\rlap{$\checkmark$}}\square$     &  $\Box$& \\ \hline
+Hanxin Zhang   & 20437677  & $\text{\rlap{$\checkmark$}}\square$     &  $\Box$& CS \& STAT\\
+     \hline
+\end{tabular}\\\\
+
+  
+Your project falls into one of the following categories. Check the
+boxes which describe your project the best.
+
+\begin{enumerate}
+
+\item $\text{\rlap{$\checkmark$}}\square$ \textbf{Kaggle project.} Our project is a Kaggle competition.
+\begin{itemize}
+\item This competition is$~~~~~$ active $\Box$ $~~~~~~$ inactive $\text{\rlap{$\checkmark$}}\square$.
+ \item Our rank in the competition is \textit{Expedia Hotel Recommendation}. 
+\item  The best Kaggle score in this competition is $\dots$ $\dots$, and our score is $\dots$.
+\end{itemize}
+
+
+
+
+
+ \item $\Box$ \textbf{New algorithm.}  We developed a new algorithm and
+ demonstrated (theoretically and/or empirically) why our technique
+is better (or worse) than other algorithms.
+% (Note: A negative result
+%does not lose marks, as long as  you followed proper theoretical
+%and/or experimental techniques). 
+\item $\Box$ \textbf{Application.}
+We applied known algorithm(s) to some domain.
+\begin{itemize}
+\item [$\Box$] We applied the algorithm(s) to our own research
+problem.
+ \item [$\Box$] We tried to reproduce results of someone
+else's paper.
+
+\item [$\Box$] We used an existing implementation of the
+algorithm(s).  \item [$\Box$] We implemented the algorithm(s)
+ourself.
+\end{itemize}
+
+\subsection*{Our most significant contributions are (List at most three):}
+\begin{enumerate}
+\item .\\
+\item .\\ 
+\item .
+\end{enumerate}
+
+\end{enumerate}
+
+List the name of programming languages, tools, packages, and software that you have used in this project:\\
+Python(numpy, sklearn, Rodeo), R(xgboost, caret), \LaTeX, Bash
+
+
+%\maketitle
+
+\setlength{\parindent}{0cm}
+\tableofcontents
+
+\chapter{Background Introduction}
+\section{Dataset}
+Expedia hotel recommendation is a Kaggle recommendation during the middle of 2016. In this competition, Expedia is looking to personalize hotel recommendations for each customers by predicting the right hotel group (out of a hundred) that a user is going to booked. The given dataset contains various factors like booking date and time, original and arrival destinations, and the submission is allowed up to five ranked hotel clusters to be evaluated. The training set contains 2013 and 2014 site traffics with 37 million events and 24 features, while the testing set contains 2015 traffics with 2.5 million events and 22 features.\\ 
+
+\section{Evalutation}
+In this Kaggle competition, the submissions will be scored on the Mean Average Precision at 5. The formula for MAP@5 is shown below.
+\[MAP@5=\frac{1}{|U|}\sum_{|U|}^{u=1}\sum_{min(5,n)}^{k=1}P(k)\]
+This scoring method will weight the score based on the order of the submission. For example, if the correct hotel cluster is 3 and the submission is "3 10 52 98 75", then it would receive the highest score as the correct submission is ranked first. A MAP@5 score for pure random guesses is 0.022.
+
+\chapter{Methods}
+
+\section{Initial Attempts}
+\subsection{Data Preprocessing}
+The first attempts before trying out any methods is to filter out unnecessary data. Since the training set is very big (4 GB), it is necessary to filter out incomplete rows that contain missing values. Moreover, time stamp column is splitted into date and time columns so they can be comprehended by machine learning algorithms. Lastly, highly correlated variables were removed. For example, there were columns for continents and countries of a use. The continent column has been removed since it is obvoius that someone from France would be booking from Europe. \\
+
+\subsection{Algorithms}
+After reformatting the data, various machine learning algorithms have been implemented including Linear Disriminant, KNN, Decision Trees, Naive Bayes, XGBoost and AdaBoost. Unfortunately, the score only ranges as high as around 0.10.
+
+\section{New Approach for Data Engineering}
+
+
+
+\chapter{Conclusion}
+\end{document} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
